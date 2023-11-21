@@ -1,0 +1,86 @@
+1. Configure the EC2 instances in the Ansible hosts file.
+- sudo vi /etc/ansible/hosts
+[servers]
+<IP1> ansible_user=ec2-user ansible_python_interpreter=/usr/bin/python
+<IP2> ansible_user=ec2-user ansible_python_interpreter=/usr/bin/python
+
+2. Add the labuser key pair to the SSH agent.
+- cd ~ && eval `ssh-agent -s` && vi labuser.pem
+- chmod 400 labuser.pem && ssh-add labuser.pem
+
+3. Clone the Git repository.
+- git clone https://github.com/kevinbayliss/ansible-demo && cd ansible-demo && ls
+
+4. Ping the hosts in servers group.
+- export ANSIBLE_HOST_KEY_CHECKING=False && ansible servers -m ping
+
+5. SSH to the remote EC2 instances.
+- ssh ec2-user@<IP1>
+- ls && exit
+- ssh ec2-user@<IP2>
+- ls && exit
+
+6. Copy a file to the remote EC2 instances using ad hoc commands.
+- ansible-doc copy
+  Ctrl Z
+- touch test_copy.txt && ls && ansible servers -m copy -a "src=test_copy.txt dest=/home/ec2-user"
+- ssh ec2-user@<IP1>
+- ls && exit
+- ssh ec2-user@<IP2>
+- ls && exit
+
+7. Query facts for the hosts in the servers group.
+- ansible servers -m setup
+
+8. Delete the file copied to the remote EC2 instances using ad hoc commands.
+- ansible servers -m file -a "dest=/home/ec2-user/test_copy.txt state=absent"
+- ssh ec2-user@<IP1>
+- ls && exit
+- ssh ec2-user@<IP2>
+- ls && exit
+
+9. Copy a file to the remote EC2 instances using a playbook.
+- mv test_copy.txt demo_a_01 && cd demo_a_01 && ls && cat playbook.yaml  && echo -e "\n"
+- ansible-playbook playbook.yaml
+- ssh ec2-user@<IP1>
+- ls && exit
+- ssh ec2-user@<IP2>
+- ls && exit
+
+10. Create a student user on the remote EC2 instances using a playbook.
+- cd ../demo_a_02 && ls && cat playbook.yaml  && echo -e "\n"
+- ansible-playbook playbook.yaml
+- ansible-playbook playbook.yaml -b
+- ssh ec2-user@<IP1>
+- ls /home && exit
+- ssh ec2-user@<IP2>
+- ls /home && exit
+
+11. Delete the student user on the remote EC2 instances using a playbook.
+- cd ../demo_a_03 && ls && cat playbook.yaml && echo -e "\n"
+- ansible-playbook playbook.yaml -b
+- ssh ec2-user@<IP1>
+- ls /home && exit
+- ssh ec2-user@<IP2>
+- ls /home && exit
+
+12. Install the latest version of Git on the remote EC2 instances using a playbook.
+- cd ../demo_a_04 && ls && cat playbook.yaml && echo -e "\n"
+- ssh ec2-user@<IP1>
+- git --version || exit
+- ssh ec2-user@<IP2>
+- git --version || exit
+- ansible-playbook playbook.yaml -b
+- ssh ec2-user@<IP1>
+- git --version && exit
+- ssh ec2-user@<IP2>
+- git --version && exit
+
+13. Delete the module.
+- cd ../../terraform-demo/demo_tf_04 && terraform destroy -auto-approve
+
+14. Close PuTTY and delete the Management stack through CloudFormation on the AWS console.
+
+15. Remove the SSH access rule from the default security group.
+
+16. End Lab and logout of the AWS Academy Learner Lab.
